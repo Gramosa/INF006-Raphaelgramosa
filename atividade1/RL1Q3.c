@@ -37,7 +37,7 @@ typedef struct DupNode{
 typedef struct DupList{
   DupNode *head;
   DupNode *tail;
-  long size;
+  //long size;
 } DupList;
  
 ////
@@ -97,18 +97,18 @@ bool add_circ_sorted(CircList *list, CircNode *node){
 }
 
 void destroy_circ_list(CircList* list){
-  if(list == NULL){
-    return;
+  if(list != NULL){
+    if(list->tail != NULL){
+      list->tail->next = NULL;
+      CircNode *n = list->head;
+      while(n != NULL){
+        CircNode* temp = n;
+        n = n->next;
+        free(temp);
+      }
+    }
+    free(list);
   }
-
-  list->tail->next = NULL;
-  CircNode *n = list->head;
-  while(n != NULL){
-    CircNode* temp = n;
-    n = n->next;
-    free(temp);
-  }
-  free(list);
 }
 
 ////
@@ -127,7 +127,7 @@ DupList* create_dup_list(){
   DupList* list = malloc(sizeof(DupList));
   list->head = NULL;
   list->tail = NULL;
-  list->size = 0L;
+  //list->size = 0L;
   return list;
 }
 
@@ -176,7 +176,7 @@ void destroy_dup_list(DupList* list){
   while(n != NULL){
     DupNode* temp = n;
     n = n->next;
-    free(temp->circ_list);
+    destroy_circ_list(temp->circ_list);
     free(temp);
   }
   free(list);

@@ -7,6 +7,11 @@
 
 #define MAX_SIZE_LINE 10000
 
+// typedef struct DoubleString{
+//   double value;
+//   char *str_repr; //string representation
+// } DoubleString;
+
 //Node usado na lista circular
 typedef struct CircNode{
   double value;
@@ -34,7 +39,7 @@ typedef struct DupList{
   DupNode *tail;
   long size;
 } DupList;
-
+ 
 ////
 // Funcoes relacionadas a lista circular simplesmente ligada
 ////
@@ -58,6 +63,7 @@ bool add_circ_sorted(CircList *list, CircNode *node){
   if(list->head == NULL){
     list->head = node;
     list->tail = node;
+    list->size = 1;
     return true;
   }
 
@@ -85,6 +91,7 @@ bool add_circ_sorted(CircList *list, CircNode *node){
 
   // Transforma a lista em circular novamente
   list->tail->next = list->head;
+  list->size++;
   
   return true;
 }
@@ -219,12 +226,12 @@ bool has_char(const char *str, const char target) {
   return false;
 }
 
-unsigned double custom_fabs(double value){
+double custom_fabs(double value){
   if(value < 0){
     value *= -1;
   }
 
-  return (unsigned double) value;
+  return value;
 }
 
 int main(){
@@ -293,9 +300,11 @@ int main(){
           //Loop para encontrar em qual lista circular adicionar o node
           DupNode *current = dup_list->head;
           while(current != NULL){
-            if(custom_fabs(current->value - value) <= 0.99){
+            //0.00000001 devido ao problema de flutuacao com numeros double
+            if(custom_fabs(current->value - value) <= 0.99 + 0.00000001){
               add_circ_sorted(current->circ_list, node);
               was_added = true;
+              break;
             }
             current = current->next;
           }
@@ -312,9 +321,24 @@ int main(){
     DupNode *current = dup_list->head;
     while(current != NULL){
       fprintf(save_file, "%ld(", current->value);
-      //Continuar daqui
+      
+      CircList *current_circ = current->circ_list;
+      long circ_size = current_circ->size;
+      CircNode *node = current_circ->head;
+      while(circ_size > 0){
+        fprintf(save_file, "%.15g", node->value);
+        if(circ_size != 1){
+          fprintf(save_file, "->");
+        }
+
+        node = node->next;
+        circ_size--;
+      }
       
       fprintf(save_file, ")");
+      if(current->next != NULL){
+        fprintf(save_file, "->");
+      }
       current = current->next;
     }
     fprintf(save_file, "]");

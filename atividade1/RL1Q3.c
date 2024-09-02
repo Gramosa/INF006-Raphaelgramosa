@@ -275,7 +275,6 @@ int main(){
     //Criacao das estruturas
     DupList *dup_list = create_dup_list();
 
-    
     //Loop que trata o token
     while ((token = custom_strsep(&c, ' ')) != NULL) {
       if(custom_strcmp(token, "LE") == 0){
